@@ -3,15 +3,6 @@
 OpSys OS;       // Global OpSys variable. Should be accessible to all modules.
 bool sigint = false;
 
-//template <std::size_t N>
-//int execvps(const char* file, const char* const (&argv)[N])
-//{
-//    cerr << "Here\n";
-//    assert((N > 0) && (argv[N - 1] == nullptr));
-//    return execvp(file, const_cast<char* const*>(argv));
-//}
-
-
 void signal_handler(int s)
 {
     if (s==SIGINT)
@@ -58,30 +49,42 @@ void OpSys::change_dir(vector<string> command)
     }
 }
 
+std::vector<const char*> make_argv( std::vector<std::string>const& in )
+{
+  std::vector<const char*> out;
+  out.reserve( in.size() + 1 );
+
+  for (const auto& s : in) {
+    out.push_back( s.data() );
+  }
+  out.push_back(NULL);
+  out.shrink_to_fit();
+
+  return out;
+}
+
 short int OpSys::simple_command(vector<string> tokens)
 {
-    pid_t pid; // valor para teste pai/filho
+    pid_t pid;
 
-//    std::vector<char*> argv(tokens.size() + 1);
-
-//    std::transform(tokens.begin(), tokens.end(), argv.begin(),
-//                   [](std::string arg) {
-//                       return &(arg)[0];
-//                   });
-
-    string command = "";
-    for (unsigned int i = 1; i<tokens.size(); i++)
-    {
-        command += tokens[i-1];
-    }
-    string bincmd = "/bin/" + command;
     int status;
+    if(is_verbose)
+    {
+        cerr << "execvp(\"" << tokens[0] << "\",\"";
+        for(unsigned int i = 0; i < tokens.size()-1; i++)
+            cerr << tokens[i] << ' ';
+        cerr << tokens.back();
+        cerr << "\");\n";
+    }
+
+
     pid = fork();
     if (pid == 0)
     {
-//        execvp(argv[0], argv.data());
-        execlp(bincmd.c_str(), command.c_str(), NULL);
+        //printf("execlp(%s, %s, NULL);", bincmd.c_str(), command.c_str());
+        execvp(tokens[0].c_str(), const_cast<char* const *>(make_argv(tokens).data()));
         cerr << tokens[0] << ": comando não encontrado\n";
+        exit(0);        // TODO: exit with cleanup
     }
     else if (pid < 0)
     {
