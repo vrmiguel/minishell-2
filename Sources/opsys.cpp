@@ -1,20 +1,20 @@
 #include "Headers/opsys.h"
 
 OpSys OS;       // Global OpSys variable. Should be accessible to all modules.
-bool sigint = false;
+bool exit_program = false;
 
 void signal_handler(int s)
 {
     if (s==SIGINT)
     {
         cout << "\nSIGINT (Ctrl+C) received. Code " << s << ". Exiting.\n";
-        sigint = true;  // We'll do this instead of an exit(0) in order to allow for cleanup.
+        exit_program = true;  // We'll do this instead of an exit(0) in order to allow for cleanup.
     }
 
     if (s==SIGHUP)
     {
         cout << "\nSIGHUP received. Code " << s << ". Exiting.\n";
-        sigint = true;  // We'll do this instead of an exit(0) in order to allow for cleanup.
+        exit_program = true;  // We'll do this instead of an exit(0) in order to allow for cleanup.
     }
 }
 
@@ -49,24 +49,19 @@ void OpSys::change_dir(vector<string> command)
     }
 }
 
-std::vector<const char*> make_argv( std::vector<std::string>const& in )
+vector<const char*> make_argv(vector<string>const& in)
 {
-  std::vector<const char*> out;
-  out.reserve( in.size() + 1 );
-
-  for (const auto& s : in) {
-    out.push_back( s.data() );
-  }
-  out.push_back(NULL);
-  out.shrink_to_fit();
-
-  return out;
+    vector<const char*> out;
+    out.reserve(in.size() + 1);
+    for (const auto& s : in)
+        out.push_back(s.data());
+    out.push_back(nullptr);
+    out.shrink_to_fit();
+    return out;
 }
 
-short int OpSys::simple_command(vector<string> tokens)
+short OpSys::simple_command(vector<string> tokens)
 {
-    pid_t pid;
-
     int status;
     if(is_verbose)
     {
@@ -78,21 +73,21 @@ short int OpSys::simple_command(vector<string> tokens)
     }
 
 
-    pid = fork();
+    pid_t pid = fork();
     if (pid == 0)
     {
         //printf("execlp(%s, %s, NULL);", bincmd.c_str(), command.c_str());
         execvp(tokens[0].c_str(), const_cast<char* const *>(make_argv(tokens).data()));
-        cerr << tokens[0] << ": comando não encontrado\n";
-        exit(0);        // TODO: exit with cleanup
+        cerr << tokens[0] << ": command not found.\n";
+        return 0;        // TODO: exit with cleanup
     }
     else if (pid < 0)
     {
-        printf("Erro ao produzir fork.");
+        printf("Couldn't fork a process.");
         return 0;
     }
     waitpid(-1, &status, WUNTRACED);
-    return 1; // sucesso
+    return 1;
 }
 
 OpSys::OpSys()

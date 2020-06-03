@@ -55,9 +55,13 @@ void Prompt::parse(string input)
     istringstream iss (input);
     copy(istream_iterator<string>(iss), istream_iterator<string>(), back_inserter(tokens));
 
-    for(unsigned short int i = 0; i < tokens.size(); i++)
-        cout << tokens[i] << ' ';
-    cout << '\n';
+    if(is_verbose)
+    {
+        cout << "Parsed: [";
+        for(unsigned short int i = 0; i < tokens.size()-1; i++)
+            cout << "\"" << tokens[i] << "\", ";
+        cout << "\"" << tokens.back() << "\"]\n";
+    }
 }
 
 short int Prompt::run()
@@ -74,7 +78,13 @@ short int Prompt::run()
     {
         cout << "Insert help text here.\n";
         return 1;
-    } else
+    } else if (!tokens[0].compare("quit"))
+    {
+        cout << "Exiting" << std::endl;
+        exit_program = true;
+        return 1;
+    }
+    else
     {
         OS.simple_command(tokens);
         return 1;

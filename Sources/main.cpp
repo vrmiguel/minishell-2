@@ -8,11 +8,11 @@ int main(int argc, char ** argv)
     SignalHandler sighandler;
     for(;;)
     {
+        if (exit_program) return 0; // Tests for SIGINT/SIGHUP
         string line;
         prompt.print();
         std::getline(cin, line);
-        if (sigint)
-            return 0;
+        if (exit_program) return 0; // Tests for "quit"
         if (cin.eof())
         {
             cout << "\nEOF found. Exiting.\n";
@@ -20,7 +20,6 @@ int main(int argc, char ** argv)
         }
         if(line.empty())
             continue;
-
         prompt.parse(line);
         prompt.run();
     }
