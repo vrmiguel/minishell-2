@@ -1,29 +1,11 @@
 #ifndef INPUT_H
 #define INPUT_H
 
-#include <iostream>
-#include <string>
-#include <sys/param.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <pwd.h>
-#include <csignal>
-#include <regex>
-#include <vector>
-#include <sstream>
-#include <algorithm>
-#include <iterator>
+#include <string>           // strings
+#include <vector>           // vectors
 
-using std::cout;
-using std::cin;
-using std::cerr;
 using std::string;
 using std::vector;
-using std::istringstream;
-using std::copy;
-using std::istream_iterator;
-using std::ostream_iterator;
 
 #define RED_ANSI   "\x1b[31m" // ANSI escape code for red
 #define BLUE_ANSI  "\x1b[34m" // ANSI escape code for blue

@@ -1,5 +1,8 @@
 #include "Headers/opsys.h"
 
+using std::cin;
+using std::cout;
+
 int main(int argc, char ** argv)
 {
     cout << "miniSHELL 2 -- github.com/vrmiguel/minishell2\n";

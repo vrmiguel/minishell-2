@@ -1,7 +1,21 @@
 #include "Headers/opsys.h"
+#include <regex>            // std::regex and std::regex_replace
 
 bool is_verbose  = false;
 bool cwd_changed = false;
+
+#include <unistd.h>         // fork, execvp
+#include <pwd.h>            // struct password, getpwuid_r
+#include <sstream>          // isstreams, osstreams
+#include <algorithm>        // copy
+#include <iterator>         // istream_iterator, iterator, back_inserter
+
+using std::istringstream;
+using std::copy;
+using std::istream_iterator;
+using std::ostream_iterator;
+using std::cin;
+using std::cout;
 
 CLIInputs::CLIInputs(int argc, char **argv)
 {
@@ -19,7 +33,7 @@ CLIInputs::CLIInputs(int argc, char **argv)
             if (!s_argv.compare("-v") || !s_argv.compare("--verbose"))
             {
                 printf("Executing in verbose mode.\n");
-                is_verbose = false;
+                is_verbose = true;
             }
         }
     }

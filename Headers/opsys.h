@@ -2,6 +2,8 @@
 #define OPSYS_H
 
 #include "input.h"
+#include <csignal>          // struct sigaction, sigaction, SIGINT, SIGHUP
+#include <iostream>         // std::cin, std::cout, printf, fprintf
 extern bool exit_program;
 
 /*!

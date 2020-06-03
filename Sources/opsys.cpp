@@ -1,5 +1,14 @@
 #include "Headers/opsys.h"
 
+#include <sys/param.h>      // MAXPATHLEN
+#include <sys/wait.h>       // waitpid
+#include <unistd.h>         // getcwd, fork, chdir, geuid, gethostname, execvp
+#include <pwd.h>            // struct passwd, getpwuid_r
+
+using std::cin;
+using std::cout;
+using std::cerr;
+
 OpSys OS;       // Global OpSys variable. Should be accessible to all modules.
 bool exit_program = false;
 
