@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <sys/param.h>
+#include <sys/wait.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <pwd.h>

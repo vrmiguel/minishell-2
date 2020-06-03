@@ -76,7 +76,7 @@ short int Prompt::run()
         return 1;
     } else
     {
-        cout << "Wait.\n";
+        OS.simple_command(tokens);
         return 1;
     }
 }

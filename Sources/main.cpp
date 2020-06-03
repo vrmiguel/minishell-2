@@ -1,4 +1,3 @@
-#include "Headers/input.h"
 #include "Headers/opsys.h"
 
 int main(int argc, char ** argv)

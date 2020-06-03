@@ -27,6 +27,7 @@ public:
     string cwd;             // Current working directory
     OpSys();
     void change_dir(vector<string>);
+    short int simple_command(vector<string>);
 };
 
 extern OpSys OS;

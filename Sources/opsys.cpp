@@ -3,6 +3,15 @@
 OpSys OS;       // Global OpSys variable. Should be accessible to all modules.
 bool sigint = false;
 
+//template <std::size_t N>
+//int execvps(const char* file, const char* const (&argv)[N])
+//{
+//    cerr << "Here\n";
+//    assert((N > 0) && (argv[N - 1] == nullptr));
+//    return execvp(file, const_cast<char* const*>(argv));
+//}
+
+
 void signal_handler(int s)
 {
     if (s==SIGINT)
@@ -47,6 +56,40 @@ void OpSys::change_dir(vector<string> command)
         get_cwd();
         cwd_changed = true;
     }
+}
+
+short int OpSys::simple_command(vector<string> tokens)
+{
+    pid_t pid; // valor para teste pai/filho
+
+//    std::vector<char*> argv(tokens.size() + 1);
+
+//    std::transform(tokens.begin(), tokens.end(), argv.begin(),
+//                   [](std::string arg) {
+//                       return &(arg)[0];
+//                   });
+
+    string command = "";
+    for (unsigned int i = 1; i<tokens.size(); i++)
+    {
+        command += tokens[i-1];
+    }
+    string bincmd = "/bin/" + command;
+    int status;
+    pid = fork();
+    if (pid == 0)
+    {
+//        execvp(argv[0], argv.data());
+        execlp(bincmd.c_str(), command.c_str(), NULL);
+        cerr << tokens[0] << ": comando não encontrado\n";
+    }
+    else if (pid < 0)
+    {
+        printf("Erro ao produzir fork.");
+        return 0;
+    }
+    waitpid(-1, &status, WUNTRACED);
+    return 1; // sucesso
 }
 
 OpSys::OpSys()
