@@ -2,6 +2,7 @@
 #define OPSYS_H
 
 #include "input.h"
+extern bool sigint;
 
 /*!
  * \class SignalHandler

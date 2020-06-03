@@ -31,7 +31,6 @@ void Prompt::get_last_dir()
     string home_dir = getenv("HOME");
     last_dir = std::regex_replace(last_dir, std::regex(home_dir), "~");     // Change HOME to ~ on the prompt line.
     this->last_dir = last_dir;
-    cout << "PROMPT " << last_dir << '\n';
 }
 
 Prompt::Prompt()
@@ -55,6 +54,7 @@ void Prompt::parse(string input)
         tokens.clear();
     istringstream iss (input);
     copy(istream_iterator<string>(iss), istream_iterator<string>(), back_inserter(tokens));
+
     for(unsigned short int i = 0; i < tokens.size(); i++)
         cout << tokens[i] << ' ';
     cout << '\n';

@@ -1,19 +1,20 @@
 #include "Headers/opsys.h"
 
 OpSys OS;       // Global OpSys variable. Should be accessible to all modules.
+bool sigint = false;
 
 void signal_handler(int s)
 {
     if (s==SIGINT)
     {
         cout << "\nSIGINT (Ctrl+C) received. Code " << s << ". Exiting.\n";
-        exit(s);
+        sigint = true;  // We'll do this instead of an exit(0) in order to allow for cleanup.
     }
 
     if (s==SIGHUP)
     {
         cout << "\nSIGHUP received. Code " << s << ". Exiting.\n";
-        exit(s);
+        sigint = true;  // We'll do this instead of an exit(0) in order to allow for cleanup.
     }
 }
 

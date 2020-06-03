@@ -12,6 +12,8 @@ int main(int argc, char ** argv)
         string line;
         prompt.print();
         std::getline(cin, line);
+        if (sigint)
+            return 0;
         if (cin.eof())
         {
             cout << "\nEOF found. Exiting.\n";
@@ -21,7 +23,7 @@ int main(int argc, char ** argv)
             continue;
 
         prompt.parse(line);
-        short int ret = prompt.run();
+        prompt.run();
     }
     return 0;
 }
