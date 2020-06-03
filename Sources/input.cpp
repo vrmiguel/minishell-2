@@ -59,7 +59,7 @@ void Prompt::print()
         get_last_dir();
         cwd_changed = false;
     }
-    cout << BLUE_ANSI << OS.username << "@" << OS.hostname << ":" << RED_ANSI << last_dir << BLUE_ANSI << "$ " << RESET_ANSI;
+    cout << BLUE_ANSI << OS.username << "@" << OS.hostname << ":" << RED_ANSI << last_dir << RESET_ANSI << "$ ";
 }
 
 void Prompt::parse(string input)

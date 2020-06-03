@@ -43,18 +43,29 @@ string OpSys::get_cwd()
 
 void OpSys::change_dir(vector<string> command)
 {
-    string cmd = "";
-    for(unsigned short int i = 1; i < command.size(); i++)
-    {
-        cmd += command[i];
+    if (command.size() == 1 || !command[1].compare("~") || !command[1].compare("$HOME"))
+    {           // User wants to cd into $HOME/~.
+        chdir(getenv("HOME"));
+        this->cwd = get_cwd();
+        cwd_changed = true;
+        return;
     }
+
+    string cmd;
+
+    for(unsigned short int i = 1; i < command.size(); i++)      // TODO: unneeded?
+        cmd += command[i];
+
     if (chdir(cmd.c_str()))
     {
-        cerr << "miniShell: cd: " << cmd << ": Arquivo ou diretório não encontrado\n";
+                // Couldn't get to change dirs
+        cerr << "minish2: cd: " << cmd << ": Arquivo ou diretório não encontrado.\n";
     }
-    else {
-        get_cwd();
-        cwd_changed = true;
+    else
+    {
+                // chdir worked. and tell Prompt to act accordingly.
+        this->cwd = get_cwd();      // Update the OpSys OS's current cwd
+        cwd_changed = true;         // Signals a cwd change to Prompt.
     }
 }
 
@@ -85,7 +96,6 @@ short OpSys::simple_command(vector<string> tokens)
     pid_t pid = fork();
     if (pid == 0)
     {
-        //printf("execlp(%s, %s, NULL);", bincmd.c_str(), command.c_str());
         execvp(tokens[0].c_str(), const_cast<char* const *>(make_argv(tokens).data()));
         cerr << tokens[0] << ": command not found.\n";
         return 0;        // TODO: exit with cleanup
