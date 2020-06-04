@@ -1,5 +1,6 @@
 #include "Headers/opsys.h"
 #include <regex>            // std::regex and std::regex_replace
+#include <termios.h>
 
 bool is_verbose  = false;
 bool cwd_changed = false;
@@ -49,7 +50,12 @@ void Prompt::get_last_dir()
 
 Prompt::Prompt()
 {
-    get_last_dir();
+//    struct termios t;
+//    tcgetattr(STDIN_FILENO, &t);
+//    t.c_lflag &= ~ICANON;
+//    tcsetattr(STDIN_FILENO, TCSANOW, &t); // WIP for arrow keys support
+
+    get_last_dir();  // Process cwd for exibition on prompt
 }
 
 void Prompt::print()
@@ -80,6 +86,13 @@ void Prompt::parse(string input)
 
 short int Prompt::run()
 {
+    string pipe = "|";
+    int pipe_count = std::count(tokens.begin(), tokens.end(), pipe);
+
+    if(pipe_count)
+    {       // Checks if there's any pipe in the given command
+        OS.piped_command(tokens, pipe_count);
+    }
     if(!tokens[0].compare("cd"))
     {
         OS.change_dir(tokens);
@@ -94,13 +107,12 @@ short int Prompt::run()
         return 1;
     } else if (!tokens[0].compare("quit"))
     {
-        cout << "Exiting" << std::endl;
+        std::cerr << "Exiting.\n";
         exit_program = true;
         return 1;
     }
     else
     {
-        OS.simple_command(tokens);
-        return 1;
+        return OS.simple_command(tokens);
     }
 }

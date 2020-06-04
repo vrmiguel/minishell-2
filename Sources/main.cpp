@@ -15,6 +15,7 @@ int main(int argc, char ** argv)
         string line;
         prompt.print();
         std::getline(cin, line);
+
         if (exit_program) return 0; // Tests for "quit"
         if (cin.eof())
         {

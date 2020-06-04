@@ -10,6 +10,10 @@ using std::vector;
 #define RED_ANSI   "\x1b[31m" // ANSI escape code for red
 #define BLUE_ANSI  "\x1b[34m" // ANSI escape code for blue
 #define RESET_ANSI "\x1b[0m"  // ANSI escape code to reset stdout's color
+#define KEY_UP    72          // ASCII code for arrow key up
+#define KEY_LEFT  75          // ASCII code for arrow key left
+#define KEY_RIGHT 77          // ASCII code for arrow key right
+#define KEY_DOWN  80          // ASCII code for arrow key down
 
 extern bool is_verbose;
 extern bool cwd_changed;

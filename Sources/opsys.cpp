@@ -80,6 +80,88 @@ vector<const char*> make_argv(vector<string>const& in)
     return out;
 }
 
+short OpSys::piped_command(vector<string> tokens, int pipe_count)
+{
+    cerr << "I'm in piped_command\n";
+    int n_commands = pipe_count + 1;
+    int file_descriptor_array[10][2];
+    unsigned short i, j=0;
+    string pipe_str = "|";
+
+    cerr << "tokens: [";
+    for(unsigned short int k = 0; k < tokens.size()-1; k++)
+        cerr << "\"" << tokens[k] << "\", ";
+    cerr << "\"" << tokens.back() << "\"]\n";
+
+    for(i=0; i < n_commands; i++)
+    {
+        if (n_commands > 10)
+        {
+            cerr << "More pipes than supported.\n";
+            return -1;
+        }
+        vector<string> aux_cmd;
+        for(;j<tokens.size();)
+        {
+            if (!tokens[j].compare(pipe_str))
+            {
+                j++;
+                cerr << "BREAKING\n";
+                break;
+            }
+            else
+            {
+                aux_cmd.push_back(tokens[j++]);
+                cerr << "aux_cmd: [";
+                for(unsigned short int k = 0; k < aux_cmd.size()-1; k++)
+                    cerr << "\"" << aux_cmd[k] << "\", ";
+                cerr << "\"" << aux_cmd.back() << "\"]\n";
+            }
+        }
+
+            // Creating pipe
+        if(i!=n_commands-1)
+        {
+              if(pipe(file_descriptor_array[i])<0)
+              {
+                  cerr << "Error on pipe initialization.\n";
+                  return -1;
+              }
+        }
+            // Forking
+        pid_t pid = fork();
+        if(pid==0) // Primeiro processo filho
+        {
+            if(i!=n_commands-1)
+            {
+                dup2(file_descriptor_array[i][WRITE_END],STDOUT_FILENO);
+                close(file_descriptor_array[i][READ_END]);
+                close(file_descriptor_array[i][WRITE_END]);
+            }
+            if(i!=0)
+            {
+                dup2(file_descriptor_array[i-1][READ_END],STDIN_FILENO);
+                close(file_descriptor_array[i-1][WRITE_END]);
+                close(file_descriptor_array[i-1][READ_END]);
+            }
+            execvp(aux_cmd[0].c_str(), const_cast<char* const *>(make_argv(aux_cmd).data()));
+            cerr << aux_cmd[0] << ": Comando não encontrado.\n";
+            return -1;
+        }
+        else
+        {
+            if(i!=0)
+            {
+                close(file_descriptor_array[i - 1][READ_END]);
+                close(file_descriptor_array[i - 1][WRITE_END]);
+            }
+        }
+    }
+    for(i=0; i<n_commands; i++)
+          wait(NULL);
+    return 1;
+}
+
 short OpSys::simple_command(vector<string> tokens)
 {
     int status;
@@ -92,13 +174,12 @@ short OpSys::simple_command(vector<string> tokens)
         cerr << "\");\n";
     }
 
-
     pid_t pid = fork();
     if (pid == 0)
     {
         execvp(tokens[0].c_str(), const_cast<char* const *>(make_argv(tokens).data()));
         cerr << tokens[0] << ": command not found.\n";
-        return 0;        // TODO: exit with cleanup
+        return -1;        // TODO: exit with cleanup
     }
     else if (pid < 0)
     {

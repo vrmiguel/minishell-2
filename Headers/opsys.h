@@ -6,6 +6,9 @@
 #include <iostream>         // std::cin, std::cout, printf, fprintf
 extern bool exit_program;
 
+#define WRITE_END 1
+#define READ_END  0
+
 /*!
  * \class SignalHandler
  * \brief Handles SIGHUP and SIGINT signals.
@@ -29,7 +32,8 @@ public:
     string cwd;             // Current working directory
     OpSys();
     void change_dir(vector<string>);
-    short int simple_command(vector<string>);
+    short simple_command(vector<string>);
+    short piped_command (vector<string>, int);
 };
 
 extern OpSys OS;
