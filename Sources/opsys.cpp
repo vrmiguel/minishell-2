@@ -99,7 +99,7 @@ short OpSys::piped_command(vector<string> tokens, int pipe_count)
     for(i=0; i < n_commands; i++)
     {
         if (n_commands > 10)
-        {
+        {               // This is an arbitrary decision. Allowing for more pipes is easily possible.
             cerr << "More pipes than supported.\n";
             return -1;
         }
@@ -107,12 +107,13 @@ short OpSys::piped_command(vector<string> tokens, int pipe_count)
         for(;j<tokens.size();)
         {
             if (!tokens[j].compare(pipe_str))
-            {
-                j++;
+            {               //  We've hit a pipe character.
+                j++;        //  Skip a position for the next iteration.
                 break;
             }
             else
-            {
+            {               /*  Current token is not a pipe character
+                             *  so let's add it to our auxiliary command vector */
                 aux_cmd.push_back(tokens[j++]);
             }
         }
@@ -164,6 +165,22 @@ short OpSys::piped_command(vector<string> tokens, int pipe_count)
     for(i=0; i<n_commands; i++)
           wait(NULL);
     return 1;
+}
+
+void OpSys::show_history()              // TODO: save (and read) history on a file? use Bourne Again's history??
+{
+    unsigned short i = 0, j;
+    for(vector<string> command : history)
+    {
+        string command_str = "";
+        for(j=0; j<command.size()-1; j++)
+        {
+            command_str += command[j] + ' ';
+        }
+        command_str += command.back();
+        printf("%-20hu\t%s\n", i++,  command_str.c_str());       // You may think this is unoptimized... which would actually be quite true.
+    }
+    fflush(stdout);
 }
 
 short OpSys::simple_command(vector<string> tokens)

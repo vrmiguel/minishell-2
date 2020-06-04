@@ -26,14 +26,17 @@ public:
 class OpSys
 {
     string get_cwd();
+    vector<vector<string>> history;
 public:
     string username;        // Username
     string hostname;        // User's hostname
     string cwd;             // Current working directory
     OpSys();
-    void change_dir(vector<string>);
+    void  change_dir(vector<string>);
+    void  show_history();
     short simple_command(vector<string>);
     short piped_command (vector<string>, int);
+    friend class Prompt;
 };
 
 extern OpSys OS;

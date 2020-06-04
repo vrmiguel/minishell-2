@@ -87,10 +87,14 @@ void Prompt::parse(string input)
 short int Prompt::run()
 {
     string pipe = "|";
+
+        // Counts occurrences of a pipe character in the given command
     int pipe_count = std::count(tokens.begin(), tokens.end(), pipe);
 
+    OS.history.push_back(tokens);   // Save the current command on OS.history
+
     if(pipe_count)
-    {       // Checks if there's any pipe in the given command
+    {       // If there were pipes on the command, run OS.piped_command();
         return OS.piped_command(tokens, pipe_count);
     }
     if(!tokens[0].compare("cd"))
@@ -105,7 +109,12 @@ short int Prompt::run()
     {
         cout << "Insert help text here.\n";
         return 1;
-    } else if (!tokens[0].compare("quit"))
+    } else if (!tokens[0].compare("history"))
+    {
+        OS.show_history();
+        return 1;
+    }
+    else if (!tokens[0].compare("quit"))
     {
         std::cerr << "Exiting.\n";
         exit_program = true;
