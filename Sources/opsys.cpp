@@ -82,16 +82,19 @@ vector<const char*> make_argv(vector<string>const& in)
 
 short OpSys::piped_command(vector<string> tokens, int pipe_count)
 {
-    cerr << "I'm in piped_command\n";
+    if(is_verbose)
+    {
+        cerr << "Running piped_command with ";
+        cerr << "tokens: [";
+        for(unsigned short int k = 0; k < tokens.size()-1; k++)
+            cerr << "\"" << tokens[k] << "\", ";
+        cerr << "\"" << tokens.back() << "\"]\n";
+    }
+
     int n_commands = pipe_count + 1;
     int file_descriptor_array[10][2];
     unsigned short i, j=0;
     string pipe_str = "|";
-
-    cerr << "tokens: [";
-    for(unsigned short int k = 0; k < tokens.size()-1; k++)
-        cerr << "\"" << tokens[k] << "\", ";
-    cerr << "\"" << tokens.back() << "\"]\n";
 
     for(i=0; i < n_commands; i++)
     {
@@ -106,16 +109,11 @@ short OpSys::piped_command(vector<string> tokens, int pipe_count)
             if (!tokens[j].compare(pipe_str))
             {
                 j++;
-                cerr << "BREAKING\n";
                 break;
             }
             else
             {
                 aux_cmd.push_back(tokens[j++]);
-                cerr << "aux_cmd: [";
-                for(unsigned short int k = 0; k < aux_cmd.size()-1; k++)
-                    cerr << "\"" << aux_cmd[k] << "\", ";
-                cerr << "\"" << aux_cmd.back() << "\"]\n";
             }
         }
 
@@ -144,12 +142,18 @@ short OpSys::piped_command(vector<string> tokens, int pipe_count)
                 close(file_descriptor_array[i-1][WRITE_END]);
                 close(file_descriptor_array[i-1][READ_END]);
             }
+            if(is_verbose)
+            {
+                cerr << "piped_command is going to execvp aux_cmd: [";
+                for(unsigned short int k = 0; k < aux_cmd.size()-1; k++)
+                    cerr << "\"" << aux_cmd[k] << "\", ";
+                cerr << "\"" << aux_cmd.back() << "\"]\n";
+            }
             execvp(aux_cmd[0].c_str(), const_cast<char* const *>(make_argv(aux_cmd).data()));
             cerr << aux_cmd[0] << ": Comando não encontrado.\n";
             return -1;
         }
-        else
-        {
+        else {
             if(i!=0)
             {
                 close(file_descriptor_array[i - 1][READ_END]);

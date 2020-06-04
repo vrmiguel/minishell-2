@@ -91,7 +91,7 @@ short int Prompt::run()
 
     if(pipe_count)
     {       // Checks if there's any pipe in the given command
-        OS.piped_command(tokens, pipe_count);
+        return OS.piped_command(tokens, pipe_count);
     }
     if(!tokens[0].compare("cd"))
     {
