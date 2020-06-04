@@ -56,6 +56,7 @@ public:
     string username;        // Username
     string hostname;        // User's hostname
     string cwd;             // Current working directory
+    string home_dir;            // User's $HOME directory
     OpSys();
     void  change_dir(vector<string>);
     void  show_history();

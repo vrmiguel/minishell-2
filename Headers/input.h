@@ -51,7 +51,7 @@ public:
      * \param argc Command-line argument count.
      * \param argv Array of strings that representing the command-line argument given.
      */
-    CLIInputs(int argc, char ** argv);
+    CLIInputs(unsigned short argc, char ** argv);
 };
 
 class Prompt

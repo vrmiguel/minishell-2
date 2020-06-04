@@ -31,7 +31,7 @@ using std::cout;
 int main(int argc, char ** argv)
 {
     cout << "miniSHELL 2 -- github.com/vrmiguel/minishell2\n";
-    CLIInputs(argc, argv);          // Process command-line arguments
+    CLIInputs((unsigned short) argc, argv);          // Process command-line arguments
     Prompt prompt;
     SignalHandler sighandler;
     for(;;)

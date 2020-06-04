@@ -70,7 +70,11 @@ void OpSys::change_dir(vector<string> command)
 {
     if (command.size() == 1 || !command[1].compare("~") || !command[1].compare("$HOME"))
     {           // User wants to cd into $HOME/~.
-        chdir(getenv("HOME"));
+        if(chdir(home_dir.c_str()))
+        {
+            cerr << "minish2: cd: " << command[1] << ": Arquivo ou diretório não encontrado.\n";
+            return;
+        }
         this->cwd = get_cwd();
         cwd_changed = true;
         return;
@@ -124,7 +128,8 @@ short OpSys::piped_command(vector<string> tokens, int pipe_count)
     for(i=0; i < n_commands; i++)
     {
         if (n_commands > 10)
-        {               // This is an arbitrary decision. Allowing for more pipes is easily possible.
+        {               /* This is an arbitrary decision. You can allow for more pipes by
+                           altering this `if` and the size of file_descriptor_array. */
             cerr << "More pipes than supported.\n";
             return -1;
         }
@@ -154,8 +159,8 @@ short OpSys::piped_command(vector<string> tokens, int pipe_count)
         }
             // Forking
         pid_t pid = fork();
-        if(pid==0) // Primeiro processo filho
-        {
+        if(pid==0)
+        {                   // Child process
             if(i!=n_commands-1)
             {
                 dup2(file_descriptor_array[i][WRITE_END],STDOUT_FILENO);
@@ -175,20 +180,20 @@ short OpSys::piped_command(vector<string> tokens, int pipe_count)
                     cerr << "\"" << aux_cmd[k] << "\", ";
                 cerr << "\"" << aux_cmd.back() << "\"]\n";
             }
-            execvp(aux_cmd[0].c_str(), const_cast<char* const *>(make_argv(aux_cmd).data()));
-            cerr << aux_cmd[0] << ": Comando não encontrado.\n";
+            execvp(aux_cmd[0].c_str(), const_cast<char* const *>(make_argv(aux_cmd).data()));   // TODO: use OS.simple_command here
+            cerr << aux_cmd[0] << ": Command not found.\n";
             return -1;
         }
         else {
             if(i!=0)
-            {
+            {       // Close the file descriptors previously used
                 close(file_descriptor_array[i - 1][READ_END]);
                 close(file_descriptor_array[i - 1][WRITE_END]);
             }
         }
     }
     for(i=0; i<n_commands; i++)
-          wait(NULL);
+          wait(NULL);       // Wait for all commands to finish.
     return 1;
 }
 
@@ -203,13 +208,41 @@ void OpSys::show_history()              // TODO: save (and read) history on a fi
             command_str += command[j] + ' ';
         }
         command_str += command.back();
-        printf("%-20hu\t%s\n", i++,  command_str.c_str());       // You may think this is unoptimized... which would actually be quite true.
+        printf("%-20hu\t%s\n", i++,  command_str.c_str());  // You may think this is unoptimized... which would actually be quite true.
     }
     fflush(stdout);
 }
 
 short OpSys::simple_command(vector<string> tokens)
 {
+
+    /* Checking for internal minishell functions */
+    if(!tokens[0].compare("cd"))
+    {
+        OS.change_dir(tokens);
+        return cwd_changed;
+    } else if (!tokens[0].compare("pwd"))
+    {
+        cout << OS.cwd << '\n';
+        return 1;
+    } else if (!tokens[0].compare("help"))
+    {
+        cout << "Insert help text here.\n";
+        return 1;
+    } else if (!tokens[0].compare("history"))
+    {
+        OS.show_history();
+        return 1;
+    }
+    else if (!tokens[0].compare("quit"))
+    {
+        std::cerr << "Exiting.\n";
+        exit_program = true;
+        return 1;
+    }
+
+
+    /* Running an external command */
     int status;
     if(is_verbose)
     {
@@ -223,15 +256,19 @@ short OpSys::simple_command(vector<string> tokens)
     pid_t pid = fork();
     if (pid == 0)
     {
+                // Child process is going to execvp the given command
         execvp(tokens[0].c_str(), const_cast<char* const *>(make_argv(tokens).data()));
+                // The following lines will only run if execvp doesn't work.
         cerr << tokens[0] << ": command not found.\n";
-        return -1;        // TODO: exit with cleanup
+        return -1;
     }
     else if (pid < 0)
     {
-        printf("Couldn't fork a process.");
-        return 0;
+        cerr << "Couldn't fork a process.";
+        return -1;
     }
+
+        // Block the parent process until the child process finishes.
     waitpid(-1, &status, WUNTRACED);
     return 1;
 }
@@ -251,7 +288,13 @@ OpSys::OpSys()
     getpwuid_r(uid, &pwent, buffer, sizeof buffer, &pwent_ptr);
     username = pwent.pw_name;   // Saves username
 
-    char hostname[64];
-    gethostname(hostname, 64);
-    this->hostname = hostname;
+    string home = getenv("HOME");
+    if(home.empty())
+        cerr << "Couldn't obtain $HOME.\n";
+
+    this->home_dir = home;
+
+    char hostname_buffer[64];
+    gethostname(hostname_buffer, 64);
+    this->hostname = hostname_buffer;
 }
