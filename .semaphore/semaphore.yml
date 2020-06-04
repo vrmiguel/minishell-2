@@ -1,0 +1,21 @@
+version: v1.0
+name: miniSHELL2
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu1804
+blocks:
+  - name: Build miniSHELL2
+    task:
+      jobs:
+        - name: Build miniSHELL2 with G++ 7 and 8
+          matrix:
+            - env_var: GPP_VERSION
+              values:
+                - '7'
+                - '8'
+          commands:
+            - checkout
+            - sem-version cpp $GPP_VERSION
+            - g++ -c -pipe -std=gnu++11 -Wall -W -fPIC -I. Sources/main.cpp Sources/opsys.cpp Sources/input.cpp
+            - 'g++ -Wl,-O1 -o minishell-2 input.o main.o opsys.o'
