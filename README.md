@@ -1,4 +1,4 @@
-# minishell-2
+# minishell-2 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) [![Semaphore Build](https://vrmiguel.semaphoreci.com/badges/minishell-2/branches/master.svg?style=shields)](https://vrmiguel.semaphoreci.com/projects/minishell-2/)
 Unix shell written in pure C++11.
 
 ## Building
