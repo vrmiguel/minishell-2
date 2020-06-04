@@ -208,7 +208,7 @@ void OpSys::show_history()              // TODO: save (and read) history on a fi
             command_str += command[j] + ' ';
         }
         command_str += command.back();
-        printf("%-20hu\t%s\n", i++,  command_str.c_str());  // You may think this is unoptimized... which would actually be quite true.
+        printf("%-20hu\t%s\n", (unsigned short) i++,  command_str.c_str());  // You may think this is unoptimized... which would actually be quite true.
     }
     fflush(stdout);
 }
