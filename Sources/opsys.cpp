@@ -199,16 +199,14 @@ short OpSys::piped_command(vector<string> tokens, int pipe_count)
 
 void OpSys::show_history()              // TODO: save (and read) history on a file? use Bourne Again's history??
 {
-    unsigned short i = 0, j;
+    unsigned short i = 0;
     for(vector<string> command : history)
     {
-        string command_str = "";
-        for(j=0; j<command.size()-1; j++)
-        {
-            command_str += command[j] + ' ';
-        }
-        command_str += command.back();
-        printf("%-20hu\t%s\n", (unsigned short) i++,  command_str.c_str());  // You may think this is unoptimized... which would actually be quite true.
+        string command_str;
+        for(string command_part : command)
+            command_str += command_part + ' ';
+
+        printf("%-20hu\t%s\n", (unsigned short) i++,  command_str.c_str());
     }
     fflush(stdout);
 }
